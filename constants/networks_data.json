@@ -1,0 +1,20 @@
+{
+  "Base": {
+    "chain_id": 8453,
+    "rpc_url": "https://1rpc.io/base",
+    "explorer_url": "https://basescan.org/",
+    "usdc_pool_address": "0x27a16dc786820B16E5c9028b75B99F6f604b5d26",
+    "native_pool_address": "0xdc181Bd607330aeeBEF6ea62e03e5e1Fb4B6F7C7",
+    "usdc_address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "endpoint_id": 30184
+  },
+  "Arbitrum": {
+    "chain_id": 42161,
+    "rpc_url": "https://arbitrum-one-rpc.publicnode.com",
+    "explorer_url": "https://arbiscan.io/",
+    "usdc_pool_address": "0xe8CDF27AcD73a434D661C84887215F7598e7d0d3",
+    "native_pool_address": "0xA45B5130f36CDcA45667738e2a258AB09f4A5f7F",
+    "usdc_address": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+    "endpoint_id": 30110
+  }
+}
