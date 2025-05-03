@@ -8,7 +8,7 @@ import json
 import os
 import re
 
-MIN_AMOUNT = Decimal(0.00005)
+MIN_AMOUNT = Decimal(0.0001)
 logger = logging.getLogger(__name__)
 load_dotenv(dotenv_path=".env")
 
@@ -225,5 +225,5 @@ class ConfigValidator:
             exit(1)
 
         if amount < MIN_AMOUNT:
-            logging.error("❗️ Количество токенов для отправки слишком мало, введите значение больше 0.00005.")
+            logging.error(f"❗️ Количество токенов для отправки слишком мало, введите значение больше {MIN_AMOUNT}.")
             exit(1)

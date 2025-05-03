@@ -55,14 +55,16 @@ def retry_on_proxy_error(max_attempts: int = 3, fallback_no_proxy: bool = True):
 
 
 class Client:
-    def __init__(self, pool_address: str, chain_id: int, rpc_url: str, private_key: str, explorer_url: str,
-                 proxy: Optional[str] = None):
+    def __init__(self, pool_address: str, chain_id: int, rpc_url: str, private_key: str, explorer_url: str, token: str,
+                 amount: float | int, proxy: Optional[str] = None):
         request_kwargs = {"proxy": f"http://{proxy}"} if proxy else {}
         self.explorer_url = explorer_url
         self.private_key = private_key
         self.pool_address = pool_address
         self.account = Account.from_key(self.private_key)
         self.chain_id = chain_id
+        self.token = token
+        self.amount = amount
         self.rpc_url = rpc_url
         self.proxy = proxy
 
@@ -84,6 +86,9 @@ class Client:
         self.eip_1559 = True
         self.address = self.w3.to_checksum_address(
             self.w3.eth.account.from_key(self.private_key).address)
+
+    async def set_amount(self, real_amount: int):
+        self.amount = real_amount
 
     # Получение баланса нативного токена
     async def get_native_balance(self) -> float:
@@ -173,7 +178,8 @@ class Client:
         return self.w3.from_wei(number, unit_name)
 
     # Approve
-    async def approve_usdc(self, usdc_contract, spender, amount, eip_1559: bool):
+    async def approve_usdc(self, usdc_address, spender, amount, eip_1559: bool):
+        contract = await self.get_contract(usdc_address, ERC20_ABI)
         owner = self.address
         nonce = await self.w3.eth.get_transaction_count(owner)
         chain_id = await self.w3.eth.chain_id
@@ -199,7 +205,7 @@ class Client:
             tx_params['gasPrice'] = int(await self.w3.eth.gas_price * 1.25)
 
         # Формирование транзакции approve
-        tx = await usdc_contract.functions.approve(spender, amount).build_transaction(tx_params)
+        tx = await contract.functions.approve(spender, amount).build_transaction(tx_params)
 
         # Подпись и отправка
         signed_tx = self.w3.eth.account.sign_transaction(tx, self.private_key)
@@ -236,12 +242,14 @@ class Client:
     async def sign_and_send_tx(self, transaction: TxParams, without_gas: bool = False,
                                external_gas: Optional[int] = None):
         try:
+
             if not without_gas:
                 if external_gas:
                     transaction["gas"] = int(external_gas * 1.5)
                 else:
                     transaction["gas"] = int((await self.w3.eth.estimate_gas(transaction)) * 1.5)
-
+            nonce = await self.w3.eth.get_transaction_count(self.address)
+            transaction['nonce'] = nonce
             signed = self.w3.eth.account.sign_transaction(transaction, self.private_key)
             signed_raw_tx = signed.raw_transaction
             logger.info("✅ Транзакция подписана\n")

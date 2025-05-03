@@ -1,15 +1,16 @@
 from eth_abi import abi
 from client.client import Client
 from utils.logger import logger
+from utils.balance_checker import check_balance
 
 
 class Bridge:
-    def __init__(self, client: Client, from_network: dict, to_network: dict, amount: int, pool_abi: list):
+    def __init__(self, client: Client, from_network: dict, to_network: dict, settings: dict, pool_abi: list):
         self.client = client
-        self.amount = amount
         self.pool_abi = pool_abi
         self.from_network = from_network
         self.to_network = to_network
+        self.settings = settings
         self.pool_contract = None
 
     @classmethod
@@ -18,13 +19,10 @@ class Bridge:
         self.pool_contract = await self.client.get_contract(contract_address=client.pool_address, abi=pool_abi)
         return self
 
-    async def get_bridge_fee(self, send_params: list):
+    async def get_fee_n_quote(self, send_params: list):
         bridge_fee = await self.pool_contract.functions.quoteSend(send_params, False).call()
-        return bridge_fee
-
-    async def wait_orbiter_status(self, tx_hash: str, timeout: int = 120, interval: int = 10) -> bool:
-
-        pass
+        quote_oft = await self.pool_contract.functions.quoteOFT(send_params).call()
+        return bridge_fee, quote_oft
 
     async def execute_bridge(self):
 
@@ -32,29 +30,53 @@ class Bridge:
             send_params = [
                 self.to_network['endpoint_id'],
                 abi.encode(["address"], [self.client.address]),
-                self.amount,
-                int(self.amount * 0.995),
-                b'0x',
-                b'0x',
-                b'0x1'
+                self.client.amount,
+                int(self.client.amount * 0.995),
+                b'',
+                b'',
+                b''
             ]
-            print(send_params)
 
-            bridge_fee = await self.get_bridge_fee(send_params)
-            print(bridge_fee)
-            fee = await self.client.from_wei_main(bridge_fee[0])
-            print(fee)
-            exit(1)
-            value = int(self.amount + bridge_fee[0])
+            bridge_fee, quote_oft = await self.get_fee_n_quote(send_params)
+
+            await check_balance(self.client, self.from_network, self.settings, bridge_fee[0])
+
+            if self.settings["token"] != "ETH":
+                value = int(bridge_fee[0])
+            else:
+                value = int(self.client.amount + bridge_fee[0])
+
+            send_params = [
+                self.to_network['endpoint_id'],
+                abi.encode(["address"], [self.client.address]),
+                self.client.amount,
+                quote_oft[2][1],
+                b'',
+                b'',
+                b''
+            ]
+
             tx = await self.pool_contract.functions.send(
                 send_params,
                 bridge_fee,
                 self.client.address
             ).build_transaction(await self.client.prepare_tx(value))
-            70548425772164
-            27900922378997
+
+            amount_approve = 2 ** 256 - 1
+
+            if self.settings["token"] == "USDC":
+                allowance = await self.client.get_allowance(self.from_network["usdc_address"], self.client.address,
+                                                            self.from_network["usdc_pool_address"])
+                if allowance < amount_approve:
+                    await self.client.approve_usdc(self.from_network["usdc_address"],
+                                                   self.from_network["usdc_pool_address"],
+                                                   amount_approve, True)
+
             tx_hash = await self.client.sign_and_send_tx(tx)
-            await self.client.wait_tx(tx_hash, self.client.explorer_url)
+            result = await self.client.wait_tx(tx_hash, self.client.explorer_url)
+            if result:
+                logger.info(f"💵 Бридж совершен, ожидайте поступления средств в сети назначения...")
+
             return
         except Exception as e:
             logger.error(f"{e}")
