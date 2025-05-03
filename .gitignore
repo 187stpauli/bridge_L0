@@ -19,8 +19,6 @@ venv/
 *.pyenv
 
 # Environment files
-.env
-.env.*
 secrets.env
 
 # VSCode / PyCharm
