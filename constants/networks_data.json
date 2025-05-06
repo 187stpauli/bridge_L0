@@ -3,7 +3,7 @@
     "chain_id": 8453,
     "rpc_url": "https://1rpc.io/base",
     "explorer_url": "https://basescan.org/",
-    "usdc_pool_address": "0x27a16dc786820B16E5c9028b75B99F6f604b5d26",
+    "usdc_pool_address": "0x27a16dc786820B16E5c9028b75B99f6f604b5d26",
     "native_pool_address": "0xdc181Bd607330aeeBEF6ea62e03e5e1Fb4B6F7C7",
     "usdc_address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
     "endpoint_id": 30184
@@ -16,5 +16,41 @@
     "native_pool_address": "0xA45B5130f36CDcA45667738e2a258AB09f4A5f7F",
     "usdc_address": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
     "endpoint_id": 30110
+  },
+  "Ethereum": {
+    "chain_id": 1,
+    "rpc_url": "https://ethereum.publicnode.com",
+    "explorer_url": "https://etherscan.io/",
+    "usdc_pool_address": "0xdf0770dF86a8034b3EFEf0A1Bb3c889B8332FF56",
+    "native_pool_address": "0x150f94B44927F078737562f0fcF3C95c01Cc2376",
+    "usdc_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "endpoint_id": 30101
+  },
+  "Optimism": {
+    "chain_id": 10,
+    "rpc_url": "https://optimism-rpc.publicnode.com",
+    "explorer_url": "https://optimistic.etherscan.io/",
+    "usdc_pool_address": "0xDecC0c09c3B5f6e92EF4184125D5648a66E35298",
+    "native_pool_address": "0xd22fa485643A812D9e365F67F9B295aE5F990e76",
+    "usdc_address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+    "endpoint_id": 30111
+  },
+  "Polygon": {
+    "chain_id": 137,
+    "rpc_url": "https://polygon-rpc.com",
+    "explorer_url": "https://polygonscan.com/",
+    "usdc_pool_address": "0x1205f31718499dBf1fCa446663B532Ef87481fe1",
+    "native_pool_address": "0x9295ee1d8C5b022Be115A2AD3c30C72E34e7F096",
+    "usdc_address": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+    "endpoint_id": 30109
+  },
+  "Avalanche": {
+    "chain_id": 43114,
+    "rpc_url": "https://avalanche-c-chain.publicnode.com",
+    "explorer_url": "https://snowtrace.io/",
+    "usdc_pool_address": "0x1205f31718499dBf1fCa446663B532Ef87481fe1",
+    "native_pool_address": "0x9295ee1d8C5b022Be115A2AD3c30C72E34e7F096",
+    "usdc_address": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+    "endpoint_id": 30106
   }
 }

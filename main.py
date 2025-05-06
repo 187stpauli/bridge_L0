@@ -2,6 +2,7 @@ from config.configvalidator import ConfigValidator
 from client.client import Client
 from modules.bridge import Bridge
 from utils.logger import logger
+from utils.bridge_tracker import BridgeTracker
 import asyncio
 import json
 
@@ -57,7 +58,26 @@ async def main():
         # Запуск бриджа
         logger.info("⚙️ Собираем и подписываем транзакцию...\n")
         bridge = await Bridge.create(client, from_network, to_network, settings, pool_abi)
-        await bridge.execute_bridge()
+        bridge_result = await bridge.execute_bridge()
+        
+        # Если бридж успешен, отслеживаем получение токенов в сети назначения
+        if bridge_result:
+            # Определяем адрес токена в сети назначения (если это не нативный токен)
+            destination_token_address = None
+            if settings["token"] == "USDC":
+                destination_token_address = to_network["usdc_address"]
+                
+            # Инициализируем трекер бриджа для отслеживания токенов в сети назначения
+            tracker = BridgeTracker(
+                destination_rpc=to_network["rpc_url"],
+                destination_explorer=to_network["explorer_url"],
+                wallet_address=client.address,
+                token_address=destination_token_address,
+                proxy=settings["proxy"]
+            )
+            
+            # Запускаем отслеживание с таймаутом 5 минут (300 секунд)
+            await tracker.check_balance_change(timeout=300)
 
     except Exception as e:
         logger.error(f"Произошла ошибка в основном пути: {e}")

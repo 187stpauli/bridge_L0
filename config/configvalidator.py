@@ -167,24 +167,32 @@ class ConfigValidator:
 
     @staticmethod
     async def validate_from_network(network: str) -> None:
-        """Валидация названия сети"""
+        """Валидация названия сети отправления"""
         networks = [
             "Base",
-            "Arbitrum"
+            "Arbitrum",
+            "Ethereum",
+            "Optimism",
+            "Polygon",
+            "Avalanche"
         ]
         if network not in networks:
-            logging.error("❗️ Ошибка: Неподдерживаемая сеть отправления! Введите одну из поддерживаемых сетей.")
+            logging.error(f"❗️ Ошибка: Неподдерживаемая сеть отправления '{network}'! Введите одну из поддерживаемых сетей: {', '.join(networks)}")
             exit(1)
 
     @staticmethod
     async def validate_to_network(network: str) -> None:
-        """Валидация названия сети"""
+        """Валидация названия сети получения"""
         networks = [
             "Base",
-            "Arbitrum"
+            "Arbitrum",
+            "Ethereum",
+            "Optimism",
+            "Polygon",
+            "Avalanche"
         ]
         if network not in networks:
-            logging.error("❗️ Ошибка: Неподдерживаемая сеть получения! Введите одну из поддерживаемых сетей.")
+            logging.error(f"❗️ Ошибка: Неподдерживаемая сеть получения '{network}'! Введите одну из поддерживаемых сетей: {', '.join(networks)}")
             exit(1)
 
     @staticmethod
